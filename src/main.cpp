@@ -1,18 +1,28 @@
 #include <Arduino.h>
+#include <FastLED.h>
+#include <MicroOscSlip.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define MA_BROCHE_ANGLE 32
+#define MA_BROCHE_BOUTON 39
+CRGB pixelAtom;
+
+MicroOscSlip<128> monOsc(&Serial);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+  pinMode( MA_BROCHE_BOUTON , INPUT );
+  FastLED.addLeds<WS2812, 27, GRB>(&pixelAtom, 1);
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  int maLectureAnalogique = analogRead(MA_BROCHE_ANGLE);
+  int maLectureBouton = digitalRead( MA_BROCHE_BOUTON );
+  pixelAtom = CRGB(0,millis() % 255,0);
+  FastLED.show();
+  //Serial.println(maLectureBouton);
+  monOsc.sendInt( "/bouton" , maLectureBouton);
+  monOsc.sendInt( "/analog" , maLectureAnalogique);
+  delay(100);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
 }
